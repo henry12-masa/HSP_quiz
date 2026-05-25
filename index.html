@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSP傾向チェッククイズ</title>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8398161859137802"
+ crossorigin="anonymous"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#0f172a,#134e4a,#581c87);
+  color:#fff;
+}
+.wrap{max-width:900px;margin:auto;padding:20px}
+header{text-align:center;padding:28px 10px}
+h1{font-size:32px;margin:0 0 10px}
+.card{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+  backdrop-filter:blur(12px);
+}
+.ad{margin:18px 0;background:rgba(255,255,255,.08);padding:10px;border-radius:14px}
+.progress{height:12px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;margin:16px 0}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#a7f3d0,#c084fc,#f0abfc);transition:.3s}
+.qno{color:#ccfbf1;font-weight:800}
+.question{font-size:24px;font-weight:900;line-height:1.5;margin:14px 0 22px}
+.options{display:grid;gap:12px}
+button{
+  border:none;
+  cursor:pointer;
+  border-radius:16px;
+  padding:16px;
+  font-size:16px;
+  font-weight:800;
+}
+.option{background:#fff;color:#111827;text-align:left}
+.option:hover{transform:translateY(-2px);background:#f3e8ff}
+.start,.restart{
+  background:linear-gradient(135deg,#a7f3d0,#c084fc);
+  color:#111827;
+  width:100%;
+  margin-top:18px;
+}
+.result{text-align:center}
+.score{font-size:56px;font-weight:900;color:#ccfbf1}
+.badge{
+  display:inline-block;
+  padding:8px 16px;
+  border-radius:999px;
+  background:#fff;
+  color:#111827;
+  font-weight:900;
+  margin:10px 0;
+}
+.hidden{display:none}
+.small{opacity:.9;line-height:1.8}
+.note{
+  margin-top:14px;
+  font-size:13px;
+  opacity:.75;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<header>
+  <h1>HSP傾向チェッククイズ</h1>
+  <p>あなたは刺激や人の感情にどれくらい敏感？</p>
+</header>
+
+<div class="ad">
+  <!-- UIゲーム -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8398161859137802"
+       data-ad-slot="6325875393"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<main class="card">
+  <div id="startScreen">
+    <h2>あなたのHSP傾向をチェック</h2>
+    <p class="small">
+      全30問。直感で近いものを選んでください。<br>
+      回答すると自動で次の問題へ進みます。
+    </p>
+    <p class="note">※この診断は娯楽・セルフチェック用であり、医学的診断ではありません。</p>
+    <button class="start" onclick="startQuiz()">診断スタート</button>
+  </div>
+
+  <div id="quizScreen" class="hidden">
+    <div class="qno" id="qno"></div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div id="resultScreen" class="hidden result">
+    <h2>診断結果</h2>
+    <div class="score" id="score"></div>
+    <div class="badge" id="rank"></div>
+    <p class="small" id="comment"></p>
+    <p class="note">※つらさが強い場合は、無理せず専門家や信頼できる人に相談してください。</p>
+    <button class="restart" onclick="restartQuiz()">もう一度診断する</button>
+  </div>
+</main>
+</div>
+
+<script>
+const questions = [
+  {q:"人混みに行くと、帰ったあとかなり疲れる？",a:[["かなり当てはまる",3],["少し当てはまる",2],["あまりない",1],["ほとんどない",0]]},
+  {q:"相手の表情や声の変化にすぐ気づく？",a:[["すぐ気づく",3],["わりと気づく",2],["たまに気づく",1],["あまり気づかない",0]]},
+  {q:"大きな音や強い光が苦手？",a:[["かなり苦手",3],["少し苦手",2],["普通",1],["気にならない",0]]},
+  {q:"誰かが不機嫌だと、自分まで緊張する？",a:[["かなりする",3],["少しする",2],["たまにする",1],["ほとんどしない",0]]},
+  {q:"予定が詰まりすぎると、心が疲れやすい？",a:[["かなり疲れる",3],["少し疲れる",2],["普通",1],["平気",0]]},
+  {q:"映画や音楽で深く感動しやすい？",a:[["かなり感動しやすい",3],["わりと感動する",2],["普通",1],["あまり感動しない",0]]},
+  {q:"人の言葉をあとから何度も思い出す？",a:[["よくある",3],["たまにある",2],["少しある",1],["ほぼない",0]]},
+  {q:"急な予定変更が苦手？",a:[["かなり苦手",3],["少し苦手",2],["普通",1],["むしろ平気",0]]},
+  {q:"誰かに強く注意されると長く引きずる？",a:[["かなり引きずる",3],["少し引きずる",2],["すぐ切り替える",1],["ほぼ気にしない",0]]},
+  {q:"カフェや店内の音が気になって集中できないことがある？",a:[["よくある",3],["たまにある",2],["少しある",1],["ない",0]]},
+  {q:"相手に頼まれると断りにくい？",a:[["かなり断りにくい",3],["少し断りにくい",2],["内容による",1],["普通に断れる",0]]},
+  {q:"一人の時間がないと回復できない？",a:[["絶対必要",3],["わりと必要",2],["少し必要",1],["なくても平気",0]]},
+  {q:"細かいミスや違和感に気づきやすい？",a:[["かなり気づく",3],["わりと気づく",2],["普通",1],["あまり気づかない",0]]},
+  {q:"相手の気持ちを考えすぎて疲れる？",a:[["よく疲れる",3],["たまに疲れる",2],["少しある",1],["ほぼない",0]]},
+  {q:"怒っている人が近くにいるだけで落ち着かない？",a:[["かなり落ち着かない",3],["少し落ち着かない",2],["普通",1],["気にならない",0]]},
+  {q:"服のタグや肌ざわりが気になることがある？",a:[["かなりある",3],["たまにある",2],["少しある",1],["ない",0]]},
+  {q:"考えすぎて行動が遅くなることがある？",a:[["よくある",3],["たまにある",2],["少しある",1],["ほぼない",0]]},
+  {q:"人と長時間会った後、どっと疲れる？",a:[["かなり疲れる",3],["少し疲れる",2],["普通",1],["むしろ元気になる",0]]},
+  {q:"相手の何気ない一言に傷つきやすい？",a:[["かなり傷つく",3],["少し傷つく",2],["たまにある",1],["あまりない",0]]},
+  {q:"物事を深く考える方？",a:[["かなり深く考える",3],["わりと考える",2],["普通",1],["あまり考えない",0]]},
+  {q:"周りの空気を読みすぎることがある？",a:[["よくある",3],["たまにある",2],["少しある",1],["ほぼない",0]]},
+  {q:"競争や急かされる環境が苦手？",a:[["かなり苦手",3],["少し苦手",2],["普通",1],["得意な方",0]]},
+  {q:"誰かの相談を聞くと、自分まで重くなる？",a:[["かなり影響される",3],["少し影響される",2],["内容による",1],["切り分けられる",0]]},
+  {q:"寝る前にその日の会話を思い返す？",a:[["よく思い返す",3],["たまにある",2],["少しある",1],["ほぼない",0]]},
+  {q:"新しい場所に行くと、情報量が多くて疲れる？",a:[["かなり疲れる",3],["少し疲れる",2],["普通",1],["ワクワクする",0]]},
+  {q:"自分より他人を優先しがち？",a:[["かなりそう",3],["少しそう",2],["たまにそう",1],["あまりない",0]]},
+  {q:"強い言い方をされるのが苦手？",a:[["かなり苦手",3],["少し苦手",2],["普通",1],["平気",0]]},
+  {q:"小さな変化にも気づく方？",a:[["かなり気づく",3],["わりと気づく",2],["普通",1],["あまり気づかない",0]]},
+  {q:"休む時も、誰かに迷惑をかけてないか気になる？",a:[["かなり気になる",3],["少し気になる",2],["たまにある",1],["気にしない",0]]},
+  {q:"自分は繊細な方だと思う？",a:[["かなりそう思う",3],["少しそう思う",2],["どちらとも言えない",1],["そう思わない",0]]}
+];
+
+let current = 0;
+let score = 0;
+
+function startQuiz(){
+  current = 0;
+  score = 0;
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("quizScreen").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = questions[current];
+  document.getElementById("qno").textContent = `Q${current+1} / ${questions.length}`;
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("bar").style.width = `${(current/questions.length)*100}%`;
+
+  const options = document.getElementById("options");
+  options.innerHTML = "";
+
+  q.a.forEach(item=>{
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = item[0];
+    btn.onclick = () => answer(item[1]);
+    options.appendChild(btn);
+  });
+}
+
+function answer(point){
+  score += point;
+  current++;
+
+  if(current < questions.length){
+    setTimeout(showQuestion, 300);
+  }else{
+    showResult();
+  }
+}
+
+function showResult(){
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+
+  const max = questions.length * 3;
+  const percent = Math.round(score / max * 100);
+
+  document.getElementById("score").textContent = percent + "点";
+
+  let rank, comment;
+
+  if(percent >= 85){
+    rank = "HSP傾向かなり高め";
+    comment = "刺激や人の感情をとても敏感に受け取りやすいタイプです。無理に強くなろうとせず、休む時間と一人時間を大切にすると楽になりやすいです。";
+  }else if(percent >= 70){
+    rank = "HSP傾向高め";
+    comment = "周囲の空気や細かな変化に気づきやすいタイプです。気配り上手な反面、疲れをため込みやすいので意識的に休むことが大切です。";
+  }else if(percent >= 50){
+    rank = "やや繊細タイプ";
+    comment = "敏感さと安定感のバランスがあるタイプです。疲れやすい場面を知っておくと、もっと過ごしやすくなります。";
+  }else if(percent >= 30){
+    rank = "標準タイプ";
+    comment = "刺激や人間関係の影響はほどほどです。必要な場面では気を使えますが、引きずりすぎることは少なそうです。";
+  }else{
+    rank = "タフ・切り替え上手タイプ";
+    comment = "細かい刺激や周囲の空気に飲まれにくいタイプです。切り替えが早く、環境の変化にも比較的強そうです。";
+  }
+
+  document.getElementById("rank").textContent = rank;
+  document.getElementById("comment").textContent = comment;
+}
+
+function restartQuiz(){
+  startQuiz();
+}
+</script>
+</body>
+</html>
